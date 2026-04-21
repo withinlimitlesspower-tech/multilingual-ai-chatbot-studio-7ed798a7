@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AI Chatbot with multi-language support, voice synthesis, media integration, and programming intelligence.">
+    <meta name="keywords" content="AI, Chatbot, DeepSeek, Voice, Programming, Multi-language">
+    <meta name="author" content="AI Chatbot Project">
+    <title>AI Chatbot | Gemini-like Interface</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar for chat history and tasks -->
+        <aside class="sidebar" aria-label="Chat history and tasks sidebar">
+            <div class="sidebar-header">
+                <h1 class="logo">
+                    <i class="fas fa-robot"></i>
+                    <span>AI Assistant</span>
+                </h1>
+                <button class="btn-new-chat" id="newChatBtn" aria-label="Start new chat">
+                    <i class="fas fa-plus"></i> New Chat
+                </button>
+            </div>
+
+            <div class="sidebar-content">
+                <!-- Chat history section -->
+                <section class="chat-history-section" aria-labelledby="chatHistoryHeading">
+                    <h2 id="chatHistoryHeading" class="section-heading">
+                        <i class="fas fa-history"></i> Recent Chats
+                    </h2>
+                    <div class="chat-history-list" id="chatHistoryList">
+                        <!-- Chat history items will be dynamically inserted here -->
+                        <div class="chat-history-item active" data-chat-id="1">
+                            <i class="fas fa-message"></i>
+                            <span class="chat-title">Welcome Chat</span>
+                            <span class="chat-time">Just now</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Tasks section -->
+                <section class="tasks-section" aria-labelledby="tasksHeading">
+                    <h2 id="tasksHeading" class="section-heading">
+                        <i class="fas fa-tasks"></i> Quick Tasks
+                    </h2>
+                    <div class="task-buttons">
+                        <button class="task-btn" data-task="code" aria-label="Generate code">
+                            <i class="fas fa-code"></i> Code Generator
+                        </button>
+                        <button class="task-btn" data-task="video" aria-label="Create video project">
+                            <i class="fas fa-video"></i> Video Studio
+                        </button>
+                        <button class="task-btn" data-task="survey" aria-label="Take survey">
+                            <i class="fas fa-poll"></i> Survey
+                        </button>
+                        <button class="task-btn" data-task="image" aria-label="Search images">
+                            <i class="fas fa-image"></i> Image Search
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Language selector -->
+                <section class="language-section" aria-labelledby="languageHeading">
+                    <h2 id="languageHeading" class="section-heading">
+                        <i class="fas fa-language"></i> Language
+                    </h2>
+                    <select id="languageSelect" class="language-select" aria-label="Select conversation language">
+                        <option value="auto">Auto Detect</option>
+                        <option value="en">English</option>
+                        <option value="ur">Urdu</option>
+                        <option value="hi">Hindi</option>
+                        <option value="roman">Roman English</option>
+                        <option value="code">Programming</option>
+                    </select>
+                </section>
+
+                <!-- Settings -->
+                <section class="settings-section" aria-labelledby="settingsHeading">
+                    <h2 id="settingsHeading" class="section-heading">
+                        <i class="fas fa-cog"></i> Settings
+                    </h2>
+                    <div class="settings-options">
+                        <label class="switch" aria-label="Toggle dark mode">
+                            <input type="checkbox" id="themeToggle">
+                            <span class="slider"></span>
+                            <span class="switch-label">Dark Mode</span>
+                        </label>
+                        <label class="switch" aria-label="Toggle voice responses">
+                            <input type="checkbox" id="voiceToggle" checked>
+                            <span class="slider"></span>
+                            <span class="switch-label">Voice Response</span>
+                        </label>
+                    </div>
+                </section>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <span class="username">User</span>
+                </div>
+                <button class="btn-help" id="helpBtn" aria-label="Get help">
+                    <i class="fas fa-question-circle"></i>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main chat area -->
+        <main class="main-content" aria-label="Main chat area">
+            <!-- Chat header -->
+            <header class="chat-header">
+                <button class="btn-sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="chat-title">
+                    <h2>AI Assistant</h2>
+                    <div class="status-indicator">
+                        <span class="status-dot"></span>
+                        <span class="status-text">Connected</span>
+                    </div>
+                </div>
+                <div class="chat-actions">
+                    <button class="btn-action" id="clearChatBtn" aria-label="Clear chat">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                    <button class="btn-action" id="exportChatBtn" aria-label="Export chat">
+                        <i class="fas fa-download"></i>
+                    </button>
+                    <button class="btn-action" id="fullscreenBtn" aria-label="Toggle fullscreen">
+                        <i class="fas fa-expand"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Chat messages container -->
+            <div class="chat-container" id="chatContainer">
+                <!-- Welcome message -->
+                <div class="message-wrapper ai-message">
+                    <div class="avatar">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="message-content">
+                        <div class="message-header">
+                            <span class="sender">AI Assistant</span>
+                            <span class="timestamp">Just now</span>
+                        </div>
+                        <div class="message-text">
+                            <p>Hello! I'm your AI assistant with multi-language support (English, Urdu, Hindi, Roman English) and programming intelligence.</p>
+                            <p>I can help you with:</p>
+                            <ul>
+                                <li>Code generation and programming tasks</li>
+                                <li>Creating video studio projects</li>
+                                <li>Voice conversations using 11Labs</li>
+                                <li>Finding images and videos from Pixabay</li>
+                                <li>Conducting surveys</li>
+                            </ul>
+                            <p>How can I assist you today?</p>
+                        </div>
+                        <div class="message-actions">
+                            <button class="btn-message-action" data-action="voice" aria-label="Play voice response">
+                                <i class="fas fa-volume-up"></i>
+                            </button>
+                            <button class="btn-message-action" data-action="copy" aria-label="Copy message">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input area -->
+            <div class="input-area">
+                <div class="input-tools">
+                    <button class="btn-tool" id="attachFileBtn" aria-label="Attach file">
+                        <i class="fas fa-paperclip"></i>
+                    </button>
+                    <button class="btn-tool" id="voiceInputBtn" aria-label="Voice input">
+                        <i class="fas fa-microphone"></i>
+                    </button>
+                    <button class="btn-tool" id="imageSearchBtn" aria-label="Search images">
+                        <i class="fas fa-image"></i>
+                    </button>
+                    <button class="btn-tool" id="codeModeBtn" aria-label="Code mode">
+                        <i class="fas fa-code"></i>
+                    </button>
+                </div>
+                
+                <div class="input-wrapper">
+                    <textarea 
+                        id="messageInput" 
+                        class="message-input" 
+                        placeholder="Type your message here... (Supports multiple languages and code)" 
+                        rows="1"
+                        aria-label="Type your message"
+                    ></textarea>
+                    <button class="btn-send" id="sendMessageBtn" aria-label="Send message">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+                
+                <div class="input-hints">
+                    <span class="hint">Press <kbd>Enter</kbd> to send, <kbd>Shift</kbd> + <kbd>Enter</kbd> for new line</span>
+                    <span class="hint">Try: "Create a Python video editor" or "Explain in Urdu"</span>
+                </div>
+            </div>
+
+            <!-- Media preview area -->
+            <div class="media-preview" id="mediaPreview" aria-label="Media preview">
+                <!-- Media items will appear here -->
+            </div>
+
+            <!-- Typing indicator -->
+            <div class="typing-indicator" id="typingIndicator" aria-label="AI is typing" hidden>
+                <div class="typing-dots">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                <span class="typing-text">AI Assistant is typing...</span>
+            </div>
+        </main>
+
+        <!-- Notification area -->
+        <div class="notification-area" id="notificationArea" aria-live="polite"></div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/markdown-it/13.0.1/markdown-it.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
